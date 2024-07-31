@@ -498,3 +498,34 @@ GO
 
 
 SELECT * FROM  DetailedOrderInfo 
+
+use [Northwind]
+-- Triggers
+ 
+ CREATE TABLE AuditLog (
+    LogID int IDENTITY(1,1) PRIMARY KEY,
+    TableName nvarchar(255)   null,
+    Operation nvarchar(50) null,
+    RecordID int null,
+    UpdatedBy nvarchar(255) null,
+    LogDate datetime null
+);
+
+Select * from  AuditLog
+
+
+CREATE TRIGGER trgAfterInsertOrders
+ON Orders
+AFTER INSERT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    INSERT INTO AuditLog (TableName, Operation, RecordID, UpdatedBy, LogDate)
+    SELECT 'Orders', 'INSERT', inserted.OrderID, SYSTEM_USER, GETDATE()
+    FROM inserted;	   
+END;
+
+
+ 
+  
