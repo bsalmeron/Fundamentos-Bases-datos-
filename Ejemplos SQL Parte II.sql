@@ -3,7 +3,7 @@ Descripción: Obtener una lista detallada de todos
 los pedidos realizados y sus respectivos clientes.
 •	Tablas involucradas: Orders, Customers
 •	Campos a mostrar: OrderID, OrderDate, CustomerID, CompanyName
-*/
+*/   
 
 SELECT 
 Orders.OrderID,
@@ -12,7 +12,7 @@ Customers.CustomerID,
 Customers.CompanyName
 FROM Orders
 INNER JOIN  Customers
-ON Orders.CustomerID= Customers.CustomerID
+ON   Customers.CustomerID = Orders.CustomerID
 
 /*
 Ejercicio 2: Inner Join entre Productos y Categorías
@@ -43,9 +43,13 @@ FROM [Order Details] Detalles
 INNER JOIN Products 
 ON Detalles.ProductID = Products.ProductID
 ORDER BY Detalles.OrderID ASC
+
+
+
 -- Reporte de lineas de pedido 
 SELECT Detalle.OrderID, Detalle.ProductID,
-Detalle.UnitPrice,Products.UnitPrice precioHoy, Categories.CategoryName, 
+Detalle.UnitPrice,Products.UnitPrice precioHoy, 
+Categories.CategoryName, 
 Detalle.Quantity, Detalle.Discount,
 Orders.OrderDate OrderDate FROM [Order Details] Detalle
 INNER JOIN Orders
@@ -56,6 +60,14 @@ INNER JOIN Categories
 ON Products.CategoryID = Categories.CategoryID
 WHERE Detalle.ProductID=2
 ORDER BY Orders.OrderID ASC
+
+
+ 
+
+ 
+
+
+
 --- Reporte de ventas por orden 
  SELECT 
         [Order Details].OrderID,
@@ -74,6 +86,7 @@ ORDER BY Orders.OrderID ASC
 --Vistas
 --Funciones  (escalares, tabla, system)
 --Triggers
+
 --Jobs 
 
 
@@ -124,8 +137,10 @@ ORDER BY CategoryID DESC
 
 --Funciones de agregación: MIN, MAX, COUNT, SUM, AVG
 
-SELECT MIN(UnitPrice) AS MinPrice 
-FROM Products;
+SELECT CategoryID,  MIN(UnitPrice) AS MinPrice 
+FROM Products
+group by CategoryID ;
+
 SELECT MAX(UnitPrice) AS MaxPrice 
 FROM Products;
 SELECT COUNT(*) AS ProductCount 
@@ -142,14 +157,15 @@ USE Northwind
  WHERE ProductName LIKE 'C%'
 
  SELECT ProductName FROM Products 
- WHERE ProductName LIKE '%A'
+ WHERE ProductName LIKE '%A' 
 
  SELECT ProductName, CategoryID FROM Products 
- WHERE  (CategoryID = 1) AND  (  ProductName LIKE '%Ch%') AND ( UnitPrice >50)
+ WHERE  (CategoryID = 1) AND  (  ProductName LIKE '%Ch%') 
+ AND ( UnitPrice >50)
 
  -- IN
  Select  ProductName, CategoryID from Products
- where CategoryID IN (1,2,3)
+ where ProductName IN (1,2,3,4)
  order by CategoryID 
 
 -- BETWEEN
@@ -159,9 +175,14 @@ WHERE UnitPrice BETWEEN 10 AND 20;
 
 -- UNION
  
- SELECT Distinct City  FROM (SELECT City From Customers
+SELECT Distinct City  FROM (
+
+SELECT City From Customers
  UNION 
-SELECT City From Suppliers) AS Ciudad
+SELECT City From Suppliers
+
+
+) AS Ciudad
 
  -- EXISTS
 SELECT ProductName
@@ -314,7 +335,7 @@ USE Northwind;
 GO
 
 -- Obtener pedidos que se realizaron hoy
-SELECT OrderID, CustomerID, OrderDate,  CAST(OrderDate AS DATE) 'Cast',
+SELECT OrderID, CustomerID, OrderDate,  CAST(OrderDate AS time) 'Cast',
 RequiredDate, ShippedDate
 FROM Orders
 WHERE CAST(OrderDate AS DATE) = CAST('1996-07-05 00:00:00.000' AS DATE);
@@ -357,7 +378,7 @@ SET RequiredDate = DATEADD(WEEK, 1, RequiredDate);
 GO
 
 -- Cambiar la fecha de envío de un pedido específico
-Begin Tran 
+
 UPDATE Orders
 SET ShippedDate = DATEADD(HOUR, 48, ShippedDate)
 WHERE OrderID = 10248;
@@ -433,7 +454,7 @@ GO
 
 
 EXEC AddCustomer 
-    @CustomerID = 'NEWID',
+    @CustomerID = 'JHJHJ',
     @CompanyName = 'New Company',
     @ContactName = 'John Doe',
     @ContactTitle = 'Manager',
@@ -511,7 +532,7 @@ use [Northwind]
     LogDate datetime null
 );
 
-Select * from  AuditLog
+
 
 
 CREATE TRIGGER trgAfterInsertOrders
@@ -526,6 +547,14 @@ BEGIN
     FROM inserted;	   
 END;
 
+INSERT INTO Orders (CustomerID, OrderDate, 
+ShipAddress, ShipCity, ShipCountry)
+VALUES 
+('ALFKI', '2024-08-08', 'Obere Str. 57', 'Berlin', 'Panama'),
+('ALFKI', '2024-08-08', 'Obere Str. 57', 'Berlin', 'Costa Rica'),
+('ALFKI', '2024-08-08', 'Obere Str. 57', 'Berlin', 'Colombia');
 
- 
-  
+Select * from  AuditLog
+select CustomerID, OrderDate, 
+ShipAddress, ShipCity, ShipCountry from Orders
+where CustomerID= 'ALFKI'
